@@ -1,4 +1,7 @@
 from typing import Optional, List
+
+from starlette.responses import JSONResponse
+
 from src.schemas import sch_service
 from src.models import mod_service
 from sqlalchemy.orm import Session
@@ -23,14 +26,8 @@ def create_service(service: sch_service.Service, db: Session = Depends(get_db)):
     return new_service
 
 
-@router.get("/service", response_model=List[sch_service.ServiceGet])
-def get_service(db: Session = Depends(get_db)):
-    service = db.query(mod_service.Service).all()
 
-    return service
-
-
-@router.get("/service/{id}", response_model=sch_service.Service)
+@router.get("/service/{id}", response_model=sch_service.ServiceGet)
 def get_service(id: int, db: Session = Depends(get_db)):
     service = db.query(mod_service.Service).filter(mod_service.Service.id == id).first()
 
@@ -40,7 +37,17 @@ def get_service(id: int, db: Session = Depends(get_db)):
     return service
 
 
-@router.put("/service/{id}", response_model=sch_service.Service)
+
+
+@router.get("/service", response_model=List[sch_service.ServiceGet])
+def get_service(db: Session = Depends(get_db)):
+    service = db.query(mod_service.Service).all()
+
+    return service
+
+
+
+@router.put("/service/{id}", response_model=sch_service.ServiceGet)
 def update_service(id: int, updated_service: sch_service.Service, db: Session = Depends(get_db)):
 
     service_query = db.query(mod_service.Service).filter(mod_service.Service.id == id)
@@ -57,7 +64,7 @@ def update_service(id: int, updated_service: sch_service.Service, db: Session = 
     return service_query.first()
 
 
-@router.delete("/service/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/service/{id}", status_code=status.HTTP_204_NO_CONTENT )
 def delete_service(id: int, db: Session = Depends(get_db)):
 
     service_query = db.query(mod_service.Service).filter(mod_service.Service.id == id)
@@ -70,4 +77,5 @@ def delete_service(id: int, db: Session = Depends(get_db)):
 
     service_query.delete(synchronize_session=False)
     db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_204_NO_CONTENT )
+    # return JSONResponse({'message': 'Category deleted'}, status_code=status.HTTP_204_NO_CONTENT)
